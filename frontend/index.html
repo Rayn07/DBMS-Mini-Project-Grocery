@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Inventory Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="flex h-full">
+        <nav class="w-64 bg-gray-800 text-white flex flex-col p-4">
+            <h1 class="text-2xl font-bold mb-6">Grocery DBMS</h1>
+
+            <div class="mb-6">
+                <label for="role-switcher" class="block text-sm font-medium text-gray-300 mb-2">Simulate Login As:</label>
+                <select id="role-switcher" class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="manager" selected>Manager (Suresh)</option>
+                    <option value="cashier">Cashier (Pooja)</option>
+                    <option value="stocker">Stocker (Rajesh)</option>
+                    <option value="default">Default (Public)</option>
+                </select>
+            </div>
+
+            <ul class="space-y-2">
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md bg-blue-600" data-page="page-dashboard">Dashboard</button></li>
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-stock">Stock Procedure</button></li>
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-customer">Customer Function</button></li>
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-city-query">City Nested Query</button></li>
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-employee">Employee Trigger</button></li>
+                <li><button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-crud">Product CRUD</button></li>
+                <li style="display: none;"> <button class="nav-link w-full text-left py-2 px-3 rounded-md hover:bg-gray-700" data-page="page-admin">User Admin</button></li>
+            </ul>
+        </nav>
+
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div id="toast" class="hidden fixed top-5 right-5 p-4 rounded-md text-white shadow-lg">
+                <span id="toast-message"></span>
+            </div>
+
+            <div id="page-dashboard" class="page-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Main Dashboard</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Total Units Sold (Aggregate)</h3>
+                        <button id="btn-load-sales" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Load Report</button>
+                        <div id="sales-report-container" class="mt-4 max-h-96 overflow-y-auto"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Detailed Purchases (Join)</h3>
+                        <button id="btn-load-purchases" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Load Report</button>
+                        <div id="purchases-report-container" class="mt-4 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-stock" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Stock Procedure: Get Low Stock</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <form id="form-low-stock" class="flex items-end space-x-4">
+                        <div>
+                            <label for="store_id" class="block text-sm font-medium text-gray-700">Store ID</label>
+                            <input type="number" id="store_id" value="1" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="threshold" class="block text-sm font-medium text-gray-700">Threshold</label>
+                            <input type="number" id="threshold" value="160" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm">
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Run Procedure</button>
+                    </form>
+                    <div id="low-stock-container" class="mt-6"></div>
+                </div>
+            </div>
+
+            <div id="page-customer" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Customer Function: Get Total Spent</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <form id="form-customer-spent" class="flex items-end space-x-4">
+                        <div>
+                            <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer ID</A></label>
+                            <input type="number" id="customer_id" value="1" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm">
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Run Function</button>
+                    </form>
+                    <div id="customer-spent-container" class="mt-6 text-xl"></div>
+                </div>
+            </div>
+
+            <div id="page-city-query" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Nested Query: Find Products by City</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <form id="form-city-query" class="flex items-end space-x-4">
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700">City Name</label>
+                            <input type="text" id="city" value="Bengaluru" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm">
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Run Query</button>
+                    </form>
+                    <div id="city-query-container" class="mt-6"></div>
+                </div>
+            </div>
+
+            <div id="page-employee" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Minimum Age Trigger: Add New Employee</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <p class="mb-4">Try adding an employee with a Date of Birth in 2010. The `trg_check_employee_dob` trigger will fire and return an error.</p>
+                    <form id="form-add-employee" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="number" id="emp_id" placeholder="Employee ID (e.g., 20)" class="border border-gray-300 rounded-md p-2" required>
+                        <input type="text" id="emp_fname" placeholder="First Name" class="border border-gray-300 rounded-md p-2" required>
+                        <input type="text" id="emp_lname" placeholder="Last Name" class="border border-gray-300 rounded-md p-2" required>
+                        <input type="text" id="emp_role" placeholder="Role (e.g., Cashier)" class="border border-gray-300 rounded-md p-2">
+                        <input type="number" id="emp_salary" placeholder="Salary (e.g., 35000)" class="border border-gray-300 rounded-md p-2">
+                        <input type="number" id="emp_store_id" placeholder="Store ID (e.g., 2)" class="border border-gray-300 rounded-md p-2">
+                        <div class="md:col-span-2">
+                            <label for="emp_dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                            <input type="date" id="emp_dob" class="border border-gray-300 rounded-md p-2 w-full" required>
+                        </div>
+                        <button type="submit" class="md:col-span-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Add Employee</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="page-crud" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Product Management (CRUD)</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">All Products</h3>
+                    <button id="btn-load-products" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mb-4">Load Products</button>
+                    <div id="products-crud-container" class="mt-4 max-h-96 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <div id="page-admin" class="page-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">User Administration</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Create New User</h3>
+                    <p class="mb-4 text-sm text-yellow-700 bg-yellow-100 p-3 rounded-md">
+                        <strong>Security Notice:</strong> This panel is only visible to Managers. It uses a high-privilege backend connection to create new MySQL users.
+                    </p>
+                    <form id="form-create-user" class="space-y-4">
+                        <div>
+                            <label for="new_username" class="block text-sm font-medium text-gray-700">New Username</label>
+                            <input type="text" id="new_username" placeholder="Enter Username" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm" required>
+                        </div>
+                        <div>
+                            <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
+                            <input type="password" id="new_password" placeholder="Enter Password" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm" required>
+                        </div>
+                        <div>
+                            <label for="new_role" class="block text-sm font-medium text-gray-700">Role</label>
+                            <select id="new_role" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm bg-white" required>
+                                <option value="cashier" selected>Cashier</option>
+                                <option value="stocker">Stocker</option>
+                                <option value="stocker">Manager</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Create User</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
